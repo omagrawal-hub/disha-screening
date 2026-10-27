@@ -43,7 +43,11 @@ const PROVIDER = (process.env.AI_PROVIDER || (process.env.ANTHROPIC_API_KEY && !
 const API_KEY = PROVIDER === "gemini" ? (process.env.GEMINI_API_KEY || "") : (process.env.ANTHROPIC_API_KEY || "");
 const MODEL = PROVIDER === "gemini" ? (process.env.GEMINI_MODEL || "gemini-flash-latest") : (process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6");
 const KEY_NAME = PROVIDER === "gemini" ? "GEMINI_API_KEY" : "ANTHROPIC_API_KEY";
-const CONFIG_PATH = path.join(__dirname, "config", "disha_config.json");
+// Find files even if folders were flattened when uploading to GitHub
+const firstExisting = list => list.find(p => fs.existsSync(p)) || list[0];
+const CONFIG_PATH = firstExisting([path.join(__dirname, "config", "disha_config.json"), path.join(__dirname, "disha_config.json")]);
+const PUBLIC_DIR = fs.existsSync(path.join(__dirname, "public", "index.html")) ? path.join(__dirname, "public")
+                 : (fs.existsSync(path.join(__dirname, "index.html")) ? __dirname : null);
 const DATA = path.join(__dirname, "data");
 for (const d of ["sessions", "reports", "audio"]) fs.mkdirSync(path.join(DATA, d), { recursive: true });
 
@@ -83,7 +87,11 @@ app.use((req, res, next) => {
   if (req.path.startsWith("/api/") || req.path === "/config.js") return res.status(401).json({ error: "Not signed in – reload the page and enter the PIN" });
   res.redirect("/login");
 });
-app.use(express.static(path.join(__dirname, "public")));
+if (PUBLIC_DIR === path.join(__dirname, "public")) app.use(express.static(PUBLIC_DIR));
+else if (PUBLIC_DIR) {   // screen files sit next to server.js – serve only those three
+  for (const f of ["index.html", "app.js", "styles.css"]) app.get("/" + (f === "index.html" ? "" : f), (req, res) => res.sendFile(path.join(PUBLIC_DIR, f)));
+}
+app.get("/", (req, res) => res.status(500).type("html").send("<h2>DISHA screen files are missing</h2><p>Upload the <b>public</b> folder (index.html, app.js, styles.css) to GitHub, next to server.js.</p>"));
 
 const safe = s => String(s || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
 
@@ -240,6 +248,8 @@ app.listen(PORT, () => {
   console.log(`\nDISHA is running → http://localhost:${PORT}  (open in Google Chrome)`);
   for (const line of envReport) console.log("  " + line);
   console.log(ACCESS_PIN ? "  Access PIN: ON" : "  Access PIN: off (set ACCESS_PIN before putting this online)");
+  console.log(PUBLIC_DIR ? "  Screen files: found" + (PUBLIC_DIR === __dirname ? " (next to server.js)" : " (public folder)") : "  ⚠ Screen files MISSING – upload the public folder (index.html, app.js, styles.css)");
+  console.log(fs.existsSync(CONFIG_PATH) ? "  Questions file: found" : "  ⚠ Questions file MISSING – upload config/disha_config.json");
   console.log(SHEETS_URL ? "  Google Sheet: connected" : "  Google Sheet: not connected (reports saved in data/reports only)");
   console.log(API_KEY ? `AI provider: ${PROVIDER} · model: ${MODEL}` : `WARNING: ${KEY_NAME} is missing – copy .env.example to .env and add your key.`);
 });
