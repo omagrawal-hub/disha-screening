@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DISHA – Screening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Mukta:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>DISHA</h1><p>Soft-skill screening · Pilot</p><span class="sp"></span>
+  <button id="settingsBtn">Settings</button>
+  <button id="restart">Start over</button>
+</header>
+<div class="settings" id="settings">
+  <div class="setrow">
+    <button class="btn" id="connTest">Test connection</button>
+    <span id="connStatus" class="note">Checks the local server and the API key in .env.</span>
+  </div>
+  <div class="setrow">
+    <button class="btn" id="micTest">Test microphone</button>
+    <span id="micStatus" class="note">Not tested yet.</span>
+  </div>
+  <div class="setrow">
+    <label for="voiceHi">Hindi voice</label><select id="voiceHi" class="label"></select>
+    <label for="voiceEn">English voice</label><select id="voiceEn" class="label"></select>
+    <button class="btn ghost" id="voiceTest">Hear Hindi voice</button>
+  </div>
+  <p class="note" id="voiceHelp"></p>
+  <div class="setrow" style="align-items:flex-start">
+    <label for="terms" style="min-width:120px">UC terms Disha may use<br><span class="note">One per line. Disha uses only these to answer questions and convince.</span></label>
+    <textarea id="terms" rows="9" style="flex:1;min-width:260px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit"></textarea>
+  </div>
+  <div class="setrow" style="align-items:flex-start">
+    <label for="hubs" style="min-width:120px">UC hubs<br><span class="note">One per line. Disha maps her area to the nearest hub.</span></label>
+    <textarea id="hubs" rows="6" style="flex:1;min-width:260px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit"></textarea>
+  </div>
+  <p class="note">The key stays in this browser tab only and is cleared when you close it.</p>
+</div>
+<div class="wrap">
+  <main class="stage" id="stage">
+    <div id="live">
+      <div class="top">
+        <div class="orb" id="orb">D</div>
+        <div class="qwrap">
+          <div class="qmeta" id="qmeta">Press start when the candidate is seated</div>
+          <div class="question" id="question">Namaste! Main Disha hoon.</div>
+        </div>
+      </div>
+      <div class="card" id="card">Flat 302, Sai Residency, 5th Cross, HSR Layout Sector 2, Bengaluru 560102<br><br>Service: O3+ Bridal Facial, Casmara Algae Peel-off Mask, Rica Wax Full Arms</div>
+      <div class="practical" id="practical">
+        <h3>Stage A complete. Run the hard-skill practical now.</h3>
+        <p class="note">Trainer: select the overall hard-skill result to continue to Stage B.</p>
+        <div class="opts">
+          <button class="btn" data-hs="good">Good</button>
+          <button class="btn" data-hs="average">Average</button>
+          <button class="btn" data-hs="fresher">Fresher quality</button>
+        </div>
+      </div>
+    </div>
+    <div class="log" id="log"></div>
+    <div class="caption" aria-live="polite"><span class="capwho" id="capWho"></span><span id="interim"></span></div>
+    <div class="livestate" id="liveState"></div>
+    <div class="controls" id="controls">
+      <input class="label" id="cand" placeholder="Candidate label (e.g. Test-07)">
+      <button class="btn" id="start">Start screening</button>
+      <button class="mic" id="mic" title="Pause or continue listening" aria-label="Pause or continue listening" disabled>🎙</button>
+      <div class="txt" id="typeBox" style="display:none"><input id="input" placeholder="Type the candidate's answer" disabled><button class="btn" id="send" disabled>Send</button></div>
+      <button class="btn ghost" id="undo" disabled title="Go back one question and answer it again">↺ Correct last answer</button>
+    </div>
+    <div class="actions" id="actions" style="display:none">
+      <button class="btn ghost" id="skip" title="Pilot only: move on without answering">Skip question</button>
+      <button class="btn ghost" id="pause">Pause &amp; save</button>
+      <button class="btn warn" id="endNow">End interview</button>
+      <span class="note" id="saveNote"></span>
+    </div>
+    <div class="toggles">
+      <span>Language: <button class="mini" id="langHi">हिंदी</button> <button class="mini ghost" id="langEn">English</button></span>
+      <label><input type="checkbox" id="tts" checked> Disha speaks aloud</label>
+      <label><input type="checkbox" id="typeMode"> Type instead</label>
+      <label><input type="checkbox" id="barge"> Let her interrupt Disha (headset only)</label>
+      <label><input type="checkbox" id="detectInt" checked> Flag interruptions (use a headset)</label>
+      <span id="voiceNote"></span>
+    </div>
+    <div class="result" id="result"></div>
+  </main>
+  <aside class="side">
+    <div class="panel"><h3>Saved interviews</h3><div id="sessions"><div class="note">Paused or ended interviews appear here so they can continue from where they stopped.</div></div>
+      <div style="margin-top:10px"><label class="note">Or load a session file: <input type="file" id="loadFile" accept=".json"></label></div></div>
+    <div class="panel"><h3>Progress</h3><div class="track" id="track"></div><div class="note" id="timer" style="margin-top:8px"></div></div>
+    <div class="panel"><h3>Mandatory basic checks</h3><div id="basic"></div></div>
+    <div class="panel"><h3>Answer log</h3><div class="scroll" id="answers"><div class="note">Answers appear here as Disha buckets them.</div></div></div>
+  </aside>
+</div>
+
+<script src="/config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

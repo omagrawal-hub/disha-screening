@@ -1,0 +1,1872 @@
+{
+  "meta": {
+    "name": "UC Salon (Women) Soft Skill Screening Bot – Bangalore",
+    "version": "1.4",
+    "source": "UC_Soft_Skill_Bot_Structure.xlsx (v3) with all open decisions closed",
+    "note": "Prompts are Hinglish reference text; the bot rephrases naturally in Hindi or English. Values marked 'assumed' were set to close open decisions and should be validated in the pilot."
+  },
+  "mode": {
+    "channel": "in_person_tablet",
+    "centres": [
+      "Krimson",
+      "Marathahalli"
+    ],
+    "audio": "headset_with_directional_mic",
+    "languages": {
+      "conversation": [
+        "hi",
+        "en"
+      ],
+      "clarification_only": [
+        "kn"
+      ],
+      "reading_test": "en"
+    },
+    "time_budget_minutes": {
+      "stage_a": 9.5,
+      "stage_b_incl_technical_and_scenarios": 19.5,
+      "hard_cap": 35
+    }
+  },
+  "flow_order": [
+    "stage_a",
+    "hard_skill_practical_by_trainer",
+    "stage_b",
+    "manual_checks",
+    "final_decision"
+  ],
+  "conversation_rules": {
+    "never_read_answer_options": true,
+    "never_reveal_verdict": true,
+    "verdict_question_reply": "Hamari team aapko agla step batayegi.",
+    "silence_seconds_before_repeat": 8,
+    "repeat_strategy": "simpler wording; Kannada clarification of the instruction only if still stuck",
+    "read_back_numbers": [
+      "age",
+      "uc_numbers",
+      "dates",
+      "amounts"
+    ],
+    "contradiction_handling": "ask gently once, referencing the earlier answer; set consistency_flag",
+    "rude_or_argumentative": "stay calm, continue, add note to report",
+    "interruption": "pause and resume the same question",
+    "no_diagnosis_questions": true,
+    "defer_script": "Training ke liye roz office aana hota hai aur kaam mein bhaari bag uthana padta hai, isliye abhi ye aapke liye theek nahi hoga. Jab [condition] ho jaye, tab zaroor dobara apply kijiye.",
+    "turn_actions": [
+      "clarify",
+      "answer_question",
+      "ask_missing",
+      "probe",
+      "convince",
+      "confirm",
+      "complete",
+      "close"
+    ],
+    "max_turns_per_question": 6,
+    "doubts_and_questions_count_against_candidate": false,
+    "required_fields_must_be_filled_before_moving_on": true,
+    "close_requires": "confirmed disqualifier AND (convinced already OR step not convincible)",
+    "after_max_turns": "move on; unresolved disqualifier → HOLD for manual review, never auto-reject",
+    "answer_correction": "Screener can undo the last answer; voice transcript shown for review before sending",
+    "acknowledgement_style": "Short, neutral, reflects a fact she said; no praise, no judgement, no exclamation, no claims about UC",
+    "numbers_in_speech": "Say ranges in words ('40 से 50 हज़ार'), never with '-' (TTS reads it as minus)"
+  },
+  "mandatory_basic_checks": [
+    {
+      "id": "age",
+      "step": "A2",
+      "pass": "18 <= age <= 38",
+      "manual_review": "39 <= age <= 40",
+      "reject": "age > 40 or age < 18"
+    },
+    {
+      "id": "youngest_child",
+      "step": "A4",
+      "defer": "youngest_child_age_years < 3",
+      "defer_until": "child turns 3"
+    },
+    {
+      "id": "caregiver",
+      "step": "A5",
+      "applies_if": "has_kids",
+      "pass": "named family member who has done it before (or confirms)",
+      "hold": "named but unconfirmed, or non-family only",
+      "reject": "no caregiver"
+    },
+    {
+      "id": "pregnancy",
+      "step": "A6",
+      "defer": "pregnant or baby_plan_months <= 6",
+      "score_down": "6 < baby_plan_months <= 12"
+    },
+    {
+      "id": "own_salon",
+      "step": "A7",
+      "reject": "running salon or freelance clients and will not stop",
+      "manual": "closed salon → closure proof"
+    },
+    {
+      "id": "pedicure",
+      "step": "A8",
+      "reject": "refuses pedicure and will not learn",
+      "note_only": "bikini wax"
+    },
+    {
+      "id": "travel_2_wheeler",
+      "step": "A9",
+      "reject": "won't travel 3–4 km per job, or no 2-wheeler and won't learn",
+      "flag": "depends on husband / others to drop her"
+    },
+    {
+      "id": "english_reading",
+      "step": "A10",
+      "reject": "reading_level == 'unable'"
+    },
+    {
+      "id": "spoken_hindi_english",
+      "step": "A11",
+      "reject": "spoken_level == 'none'"
+    },
+    {
+      "id": "uc_block",
+      "step": "A12",
+      "manual": "profile check on every number",
+      "reject": "blocked"
+    },
+    {
+      "id": "location",
+      "step": "A1",
+      "manual": "proximity check",
+      "reject": "outside operating area and not open to moving"
+    },
+    {
+      "id": "weekends",
+      "step": "B13",
+      "reject": "cannot work weekends",
+      "hold": "needs family permission → callback within 2 days"
+    },
+    {
+      "id": "daily_hours",
+      "step": "B14",
+      "reject": "part-time only (< 9 hrs)"
+    },
+    {
+      "id": "training",
+      "step": "B15",
+      "reject": "won't attend training"
+    }
+  ],
+  "training": {
+    "PR_days": 12,
+    "PI_days": 25,
+    "hours": "09:00–19:00",
+    "days_per_week": 6
+  },
+  "kit_recharge_inr": 2000,
+  "travel": {
+    "km_per_job": "3–4",
+    "vehicle": "2-wheeler (own or willing to learn)"
+  },
+  "routing": {
+    "salon_type": {
+      "C": "threading ~₹50, full-arm waxing ₹240–300, facial ₹600–750, pedicure ₹600–700",
+      "A": "premium chain or clearly higher rates (assumed: facial ₹1,500+)",
+      "B": "between C and A"
+    },
+    "batch": {
+      "PR": "salon type A or B AND hard skills good",
+      "PI": "salon type C OR hard skills average",
+      "NE_fresher_batch": "hard skills fresher quality but passes everything else"
+    }
+  },
+  "scoring": {
+    "method": "Straight count of correct answers (1 / 0) against fixed 'correct_if' lines",
+    "scored_items": [
+      {
+        "step": "B7",
+        "area": "Need for money",
+        "correct_if": "Names a specific current or upcoming need, or a recent major expense (loan / EMI, fees, medical bill, house, supporting family)"
+      },
+      {
+        "step": "B5",
+        "area": "Household income",
+        "correct_if": "Her income is needed at home: primary earner, single / widowed / separated, husband not working, or household income is modest"
+      },
+      {
+        "step": "B10",
+        "area": "Why UC",
+        "correct_if": "Describes how UC works (home services via app, training, earnings) — not only 'someone told me'"
+      },
+      {
+        "step": "B12",
+        "area": "Exit risk",
+        "correct_if": "No long or frequent trips, wedding or move planned in the next 12 months"
+      },
+      {
+        "step": "B13",
+        "area": "Weekend fit",
+        "correct_if": "Weekend routine allows 11-hour working days and family is on board"
+      },
+      {
+        "step": "B14",
+        "area": "Weekday fit",
+        "correct_if": "Weekday routine allows 7.5–8.5 working hours a day"
+      },
+      {
+        "step": "A9",
+        "area": "Travel",
+        "correct_if": "Travels on her own (rides or will learn a 2-wheeler); not dependent on someone dropping her"
+      },
+      {
+        "step": "B16",
+        "area": "Practice models",
+        "correct_if": "Can bring 5 or more practice models"
+      },
+      {
+        "step": "B8",
+        "area": "Earnings alignment",
+        "correct_if": "Accepts the minimum ₹40,000–50,000 PSP earnings; expectation is realistic"
+      },
+      {
+        "step": "K*",
+        "area": "Technical (4 asked)",
+        "correct_if": "Each K answer meets its 'correct if' line in the Technical bank"
+      },
+      {
+        "step": "C*",
+        "area": "Customer scenarios (3 asked)",
+        "correct_if": "Each answer includes the scenario's must-have action"
+      },
+      {
+        "step": "R1",
+        "area": "Tone & sensitivity (angry-customer role-play)",
+        "correct_if": "All four: respectful words, apologises first, acknowledges feeling, offers a fix"
+      }
+    ],
+    "total": 17,
+    "breakdown": {
+      "soft_skill": 9,
+      "technical": 4,
+      "customer_scenarios": 3,
+      "tone_roleplay": 1
+    },
+    "results": {
+      "not_eligible_or_defer": "any Mandatory Basic Check fails after convince + confirm",
+      "auto_pass": ">= 75% correct (13 / 17)",
+      "manual_review": "50–74% (9–12 / 17), or any attitude flag, or a skipped basic check",
+      "reject": "< 50% (<= 8 / 17)"
+    },
+    "flags": {
+      "arrogance": "dismissive / over-confident / blaming customers – recorded with verbatim quote; caps result at manual review"
+    },
+    "success_label": {
+      "definition": "active on UC for >= 3 months with rating >= 4.7",
+      "rating_threshold": 4.7,
+      "status": "assumed – lower of the 4.7–4.8 range"
+    },
+    "review_flags_not_scored": {
+      "volume_spike": "Answer in role-play / scenarios much louder than her usual voice (p90 > 1.8× her baseline)",
+      "interruption": "Starts speaking while Disha is talking (headset required to avoid false alarms)",
+      "very_short_reply": "2 words or fewer to an emotional prompt",
+      "use": "Flag the moment for a person to listen to; never scored automatically"
+    }
+  },
+  "manual_checks": [
+    {
+      "id": "age_verification",
+      "input": "A2",
+      "method": "Aadhaar DOB",
+      "rule": "≤38 pass · 39–40 review · >40 reject",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "uc_profile",
+      "input": "A12",
+      "method": "Look up every number: blocked, L20/L100 rating, churn reason",
+      "rule": "blocked → reject · below threshold → review",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "area_proximity",
+      "input": "A1",
+      "method": "Area → nearest hub from hub list",
+      "rule": "inside → hub · outside+open → nearest hub + move date · outside+not open → reject",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "weight",
+      "input": null,
+      "method": "Scale at centre",
+      "rule": "< 40 kg or > 85 kg → review against practical stamina (assumed thresholds)",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "health",
+      "input": "B1",
+      "method": "Only if issue mentioned",
+      "rule": "review vs job demands (9–11 hrs standing, 10–12 kg bag)",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "grooming",
+      "input": null,
+      "method": "Checklist: clean clothes, hair tied, nails trimmed, personal hygiene",
+      "rule": "4/4 pass · 1 miss note · 2+ flag",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "salon_closure",
+      "input": "A7",
+      "method": "Closure / handover proof",
+      "rule": "none → hold",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "pan_aadhaar",
+      "input": "B19",
+      "method": "Portal / documents",
+      "rule": "fix before batch (not a reject)",
+      "owner": "screening_ops"
+    },
+    {
+      "id": "hold_followups",
+      "input": "any HOLD",
+      "method": "Callback",
+      "rule": "unresolved in 7 days → close",
+      "owner": "screening_ops"
+    }
+  ],
+  "steps": [
+    {
+      "id": "A0",
+      "block": "Setup",
+      "type": "consent",
+      "prompt_hinglish": "Namaste! Main UC ki screening assistant hoon. Ye baat-cheet sirf screening ke liye record hogi. Shuru karein? Aap Hindi mein baat karengi ya English mein?",
+      "probe": null,
+      "captures": [
+        "consent",
+        "language"
+      ],
+      "good_answer": "Yes + Hindi/English",
+      "red_flags": "Declines recording",
+      "rule": "No consent → manual screening (not a reject)",
+      "est_seconds": 30,
+      "buckets": [
+        {
+          "bucket": "Agrees, Hindi / English",
+          "examples": "Haan, Hindi mein",
+          "bot_next": "Continue",
+          "outcome": "Proceed",
+          "result": "INFO"
+        },
+        {
+          "bucket": "Speaks only Kannada",
+          "examples": "Kannada mein bolti hoon",
+          "bot_next": "Clarify once in Kannada that interview is in Hindi/English; continue",
+          "outcome": "A11 decides",
+          "result": "INFO"
+        },
+        {
+          "bucket": "Refuses recording",
+          "examples": "Record mat karo",
+          "bot_next": "Thank her; hand over",
+          "outcome": "Manual screening (not a reject)",
+          "result": "HOLD"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A1",
+      "block": "Location & movement",
+      "type": "info_manual_check",
+      "prompt_hinglish": "Aap Bangalore mein kis area mein rehti hain? Roz aas-paas kin areas mein aana-jaana hota hai?",
+      "probe": "Agar kaam aapke paas wale UC hub ke aas-paas ke areas mein mile, ya zaroorat pade to thoda paas shift hona pade, to kaisa lagega?",
+      "captures": [
+        "area",
+        "nearest_hub",
+        "open_to_movement"
+      ],
+      "good_answer": "Named area; open to moving / travelling",
+      "red_flags": "'Sirf apne area mein'",
+      "rule": "Area → manual proximity check. Far + not aligned → reject",
+      "est_seconds": 50,
+      "buckets": [
+        {
+          "bucket": "Named area, open to travel / shift",
+          "examples": "Bellandur; haan, door bhi jaungi",
+          "bot_next": "Continue",
+          "outcome": "Area → proximity check",
+          "result": "MANUAL"
+        },
+        {
+          "bucket": "Far, open to moving",
+          "examples": "Hoskote, par shift ho sakti hoon",
+          "bot_next": "Ask: 'Kab tak?'",
+          "outcome": "Proximity check + move date",
+          "result": "MANUAL"
+        },
+        {
+          "bucket": "Far, not open to moving",
+          "examples": "Sirf apne area mein",
+          "bot_next": "Note",
+          "outcome": "Proximity check; likely reject",
+          "result": "MANUAL"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A2",
+      "block": "Eligibility",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "Aadhaar card pe aapki date of birth kya likhi hai?",
+      "probe": null,
+      "captures": [
+        "age"
+      ],
+      "good_answer": "18–38",
+      "red_flags": "",
+      "rule": "≤38 pass · 39–40 manual review · >40 or <18 reject",
+      "est_seconds": 20,
+      "buckets": [
+        {
+          "bucket": "18–38",
+          "examples": "32",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "39–40",
+          "examples": "39",
+          "bot_next": "Continue",
+          "outcome": "Manual review",
+          "result": "MANUAL"
+        },
+        {
+          "bucket": "Above 40 / below 18",
+          "examples": "42 / 17",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A3",
+      "block": "Family",
+      "type": "info",
+      "prompt_hinglish": "Apne ghar ke baare mein thoda bataiye — ghar mein kaun kaun hai, aur din bhar kaun kya karta hai?",
+      "probe": "(If unclear) Aapke pati kya karte hain?",
+      "captures": [
+        "marital_status",
+        "has_kids",
+        "kids_count",
+        "household_members"
+      ],
+      "good_answer": "Clear description",
+      "red_flags": "",
+      "rule": "Feeds need for money & caregiver check",
+      "est_seconds": 55,
+      "buckets": [
+        {
+          "bucket": "Clear description",
+          "examples": "Pati, saas, 2 bachche",
+          "bot_next": "Capture marital status, kids",
+          "outcome": "Fields captured",
+          "result": "INFO"
+        },
+        {
+          "bucket": "Marital status unclear",
+          "examples": "Main aur bachche",
+          "bot_next": "Ask gently: 'Aap shaadi-shuda hain?'",
+          "outcome": "Captured",
+          "result": "INFO"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A4",
+      "block": "Family",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "(If kids) Bachche kis class mein padhte hain?",
+      "probe": "Sabse chhota bachcha kitne saal ka hai?",
+      "captures": [
+        "youngest_child_age_years"
+      ],
+      "good_answer": "3 years or older",
+      "red_flags": "",
+      "rule": "Under 3 years → defer",
+      "est_seconds": 25,
+      "buckets": [
+        {
+          "bucket": "3 years or older",
+          "examples": "5 saal",
+          "bot_next": "Go to A5",
+          "outcome": "Continue",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Under 3 years",
+          "examples": "2 saal",
+          "bot_next": "Defer script: reapply when child turns 3",
+          "outcome": "Defer",
+          "result": "DEFER"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A5",
+      "block": "Family",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "Jab aap kaam pe hoti hain, tab bachchon ka din kaise chalta hai — school ke baad unke saath kaun hota hai?",
+      "probe": "Jab pehle aap kaam karti thi, tab bhi wahi sambhalte the?",
+      "captures": [
+        "caregiver_name_relation",
+        "caregiver_confirmed"
+      ],
+      "good_answer": "Named family member who has done it before",
+      "red_flags": "'Main manage kar lungi'",
+      "rule": "No named family member → reject",
+      "est_seconds": 45,
+      "buckets": [
+        {
+          "bucket": "Named family member, done before",
+          "examples": "Saas sambhalti hain, pehle bhi",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Named, not confirmed",
+          "examples": "Mummy sambhal lengi shayad",
+          "bot_next": "Probe: 'Unse baat ho gayi hai?'",
+          "outcome": "Pass if confirmed, else hold",
+          "result": "HOLD"
+        },
+        {
+          "bucket": "Non-family (maid / daycare) only",
+          "examples": "Daycare mein chhodti hoon",
+          "bot_next": "Ask: 'Weekend aur late evening?'",
+          "outcome": "Hold; screening lead decides",
+          "result": "HOLD"
+        },
+        {
+          "bucket": "No one",
+          "examples": "Main manage kar lungi",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A6",
+      "block": "Eligibility",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "Aane wale ek saal mein ghar mein koi badi cheez plan hai — jaise shaadi, family badhana, ya shift hona?",
+      "probe": "Agar abhi aap expecting hain to bata dijiye — training aur kaam physically heavy hote hain, isliye poochna zaroori hai.",
+      "captures": [
+        "pregnant",
+        "baby_plan_months"
+      ],
+      "good_answer": "No / not within 12 months",
+      "red_flags": "Plan within 6 months",
+      "rule": "Pregnant or plan ≤ 6 months → defer with script. Plan 6–12 months → stickiness down",
+      "est_seconds": 35,
+      "buckets": [
+        {
+          "bucket": "No plan in 12 months",
+          "examples": "Abhi koi plan nahi",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Pregnant / plan ≤ 6 months",
+          "examples": "Haan / 4 mahine baad",
+          "bot_next": "Defer script",
+          "outcome": "Defer",
+          "result": "DEFER"
+        },
+        {
+          "bucket": "Plan in 6–12 months",
+          "examples": "Agle saal",
+          "bot_next": "Continue",
+          "outcome": "Stickiness down",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Prefers not to say",
+          "examples": "Nahi batana",
+          "bot_next": "Accept",
+          "outcome": "No penalty",
+          "result": "INFO"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A7",
+      "block": "Own salon",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "Abhi aapka kaam kaise chal raha hai — kisi salon mein hain, ya ghar pe bhi clients aate hain?",
+      "probe": "UC join karne ke baad un clients ka kya karengi?",
+      "captures": [
+        "own_salon_status",
+        "freelance_clients",
+        "will_stop"
+      ],
+      "good_answer": "None, or closed",
+      "red_flags": "Won't leave salon / clients",
+      "rule": "Won't close / stop → reject. Closed → manual proof check",
+      "est_seconds": 45,
+      "buckets": [
+        {
+          "bucket": "Neither",
+          "examples": "Nahi",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Had salon, closed",
+          "examples": "Covid mein band",
+          "bot_next": "Ask her to bring proof",
+          "outcome": "Closure proof check",
+          "result": "MANUAL"
+        },
+        {
+          "bucket": "Freelance, will stop",
+          "examples": "5–6 clients, chhod dungi",
+          "bot_next": "Continue",
+          "outcome": "Stickiness slightly down",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Won't close / stop",
+          "examples": "Salon bhi chalega, UC bhi",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A8",
+      "block": "Services",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "Pichli jagah aap sabse zyada kaun si services karti thi? Pedicure-manicure kitni baar karti thi?",
+      "probe": "Agar pedicure kam kiya hai, to seekhne mein kaisa lagega?",
+      "captures": [
+        "does_pedicure",
+        "willing_to_learn_pedicure",
+        "bikini_wax_note"
+      ],
+      "good_answer": "Does pedicure or ready to learn",
+      "red_flags": "Refuses pedicure",
+      "rule": "Refuses pedicure & won't learn → reject. Bikini wax → note only",
+      "est_seconds": 35,
+      "buckets": [
+        {
+          "bucket": "Does pedicure / ready to learn",
+          "examples": "Karti hoon",
+          "bot_next": "Ask bikini wax; note answer",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Hesitant on pedicure",
+          "examples": "Pedicure kam kiya hai",
+          "bot_next": "Explain it's taught in training; ask again",
+          "outcome": "Pass if agrees",
+          "result": "HOLD"
+        },
+        {
+          "bucket": "Refuses pedicure",
+          "examples": "Pedicure nahi karungi",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A9",
+      "block": "Travel",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "Abhi aap kaam pe ya market kaise jaati hain?",
+      "probe": "Agar job 3–4 km door ho to kaise pahunchengi — scooty se khud, ya koi chhodega?",
+      "captures": [
+        "willing_to_travel_3_4km",
+        "has_2_wheeler",
+        "willing_to_learn_2_wheeler",
+        "travels_independently"
+      ],
+      "good_answer": "Rides or will learn; travels on her own",
+      "red_flags": "Refuses travel; depends on husband to drop",
+      "rule": "Won't travel / no 2-wheeler and won't learn → reject. Depends on husband → flag",
+      "est_seconds": 50,
+      "buckets": [
+        {
+          "bucket": "Has 2-wheeler, travels herself",
+          "examples": "Scooty hai, khud jaungi",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "No 2-wheeler, will learn",
+          "examples": "Seekh lungi",
+          "bot_next": "Continue",
+          "outcome": "Pass; training note",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Depends on husband to drop",
+          "examples": "Pati chhod denge",
+          "bot_next": "Probe: 'Jab wo kaam pe hon tab?'",
+          "outcome": "Flag: availability risk",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Won't travel / won't ride",
+          "examples": "Paas mein hi / scooty nahi chalaungi",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "A",
+      "scored": true,
+      "correct_if": "Travels on her own (rides or will learn a 2-wheeler); not dependent on someone dropping her"
+    },
+    {
+      "id": "A10",
+      "block": "Reading",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "(Tablet shows card) Ye address aur service card zor se padhiye.",
+      "probe": null,
+      "captures": [
+        "reading_level"
+      ],
+      "good_answer": "Reads address + product names fluently",
+      "red_flags": "Can't read English words",
+      "rule": "Fluent / with mistakes / unable. Unable → reject",
+      "est_seconds": 60,
+      "buckets": [
+        {
+          "bucket": "Fluent",
+          "examples": "Reads O3+, Casmara cleanly",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Mistakes on long words",
+          "examples": "Slow on product names",
+          "bot_next": "Continue",
+          "outcome": "Pass; communication medium",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Can't read English",
+          "examples": "Stops",
+          "bot_next": "Polite close: practise, reapply",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A11",
+      "block": "Spoken language",
+      "type": "mandatory_basic_check",
+      "prompt_hinglish": "Maan lijiye aap customer ke ghar pahunchi hain. Mujhe customer samajhkar Hindi ya English mein apna introduction dijiye.",
+      "probe": "Ab batayiye aap aaj kya service karengi.",
+      "captures": [
+        "spoken_level"
+      ],
+      "good_answer": "Greets, introduces self + UC, explains service",
+      "red_flags": "Can't form sentences in Hindi or English",
+      "rule": "Can't converse → reject. Also scores Communication",
+      "est_seconds": 60,
+      "buckets": [
+        {
+          "bucket": "Fluent",
+          "examples": "Namaste ma'am, main UC se Priya, aaj waxing hai…",
+          "bot_next": "Continue",
+          "outcome": "Pass; communication full",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Basic but understandable",
+          "examples": "Main… UC se… waxing",
+          "bot_next": "Continue",
+          "outcome": "Pass; communication medium",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Can't converse in Hindi / English",
+          "examples": "Only Kannada / silence",
+          "bot_next": "Repeat simpler once; then close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "A12",
+      "block": "UC history",
+      "type": "info_manual_check",
+      "prompt_hinglish": "Kya kabhi pehle UC, Yes Madam ya kisi aur app ke through kaam kiya hai? Unme kaun se phone number use kiye the?",
+      "probe": "Koi purana number ya doosra sim? Kaunsi category mein thi?",
+      "captures": [
+        "uc_numbers",
+        "past_uc_category"
+      ],
+      "good_answer": "Shares all numbers",
+      "red_flags": "Says no, later mentions UC",
+      "rule": "Numbers → manual profile check (blocked → reject)",
+      "est_seconds": 45,
+      "buckets": [
+        {
+          "bucket": "Never worked with UC",
+          "examples": "Nahi",
+          "bot_next": "Continue",
+          "outcome": "Registered number → profile check",
+          "result": "MANUAL"
+        },
+        {
+          "bucket": "Worked, shares numbers",
+          "examples": "2 number the",
+          "bot_next": "Ask category for each",
+          "outcome": "All numbers → profile check",
+          "result": "MANUAL"
+        },
+        {
+          "bucket": "Can't recall number",
+          "examples": "Purana sim band",
+          "bot_next": "Ask name, category, year",
+          "outcome": "Profile check by details",
+          "result": "MANUAL"
+        }
+      ],
+      "stage": "A",
+      "scored": false
+    },
+    {
+      "id": "B1",
+      "block": "Physical / health",
+      "type": "info_manual_check",
+      "prompt_hinglish": "Pichli job mein ek din mein kitne ghante khade rehkar kaam hota tha? Shaam tak thakaan kaisi hoti thi?",
+      "probe": "Koi takleef jo poora din khade rehne ya bag uthane mein dikkat de?",
+      "captures": [
+        "physical_issue_mentioned",
+        "physical_note"
+      ],
+      "good_answer": "Has done full-day standing work",
+      "red_flags": "Says she can't stand long / lift",
+      "rule": "Goes to manual health check. Bot never asks for a diagnosis",
+      "est_seconds": 35,
+      "buckets": [
+        {
+          "bucket": "No issues",
+          "examples": "10 ghante kaam kiya hai",
+          "bot_next": "Continue",
+          "outcome": "Health check: clear",
+          "result": "MANUAL"
+        },
+        {
+          "bucket": "Mentions an issue",
+          "examples": "Back pain, thyroid",
+          "bot_next": "Note only — no diagnosis",
+          "outcome": "Manual health check",
+          "result": "MANUAL"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B2",
+      "block": "Experience",
+      "type": "info",
+      "prompt_hinglish": "Aapka beauty ka safar kaise shuru hua? Kahan kahan kaam kiya, aur wo salon kis area mein the?",
+      "probe": "Wahan ek normal din kaisa hota tha — kitne clients aate the?",
+      "captures": [
+        "years_experience",
+        "salons",
+        "fresher_flag"
+      ],
+      "good_answer": "Salon names + day detail",
+      "red_flags": "Vague; course only",
+      "rule": "< 1 yr → fresher flag (practical confirms)",
+      "est_seconds": 65,
+      "buckets": [
+        {
+          "bucket": "≥ 1 yr, names + day detail",
+          "examples": "Green Trends 3 saal",
+          "bot_next": "Continue",
+          "outcome": "Captured",
+          "result": "INFO"
+        },
+        {
+          "bucket": "< 1 yr / course only",
+          "examples": "3 mahine course",
+          "bot_next": "Continue",
+          "outcome": "Fresher flag; practical confirms",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Doesn't add up",
+          "examples": "10 saal… naam yaad nahi",
+          "bot_next": "Probe day-in-life, gaps",
+          "outcome": "Inflated-experience flag",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B3",
+      "block": "Salon type",
+      "type": "info_routing",
+      "prompt_hinglish": "Aap jis salon mein kaam karti thi uska naam kya tha? Wahan threading, full-arm waxing, ek normal facial aur pedicure ka rate kya tha?",
+      "probe": "Wahan kaun se brand ke products use hote the?",
+      "captures": [
+        "salon_name",
+        "rates_quoted",
+        "salon_type"
+      ],
+      "good_answer": "Known chain or higher rates",
+      "red_flags": "Local rates only",
+      "rule": "C = threading ~₹50, waxing ₹240–300, facial ₹600–750, pedicure ₹600–700 · A = premium chain / clearly higher · B = between",
+      "est_seconds": 50,
+      "buckets": [
+        {
+          "bucket": "A – premium",
+          "examples": "Lakme / Naturals / Green Trends, facial ₹1,500+",
+          "bot_next": "Continue",
+          "outcome": "A → PR candidate",
+          "result": "INFO"
+        },
+        {
+          "bucket": "B – mid",
+          "examples": "Chain or rates between C and A",
+          "bot_next": "Continue",
+          "outcome": "B → PR / PI per hard skill",
+          "result": "INFO"
+        },
+        {
+          "bucket": "C – local",
+          "examples": "Threading ₹50, waxing ₹240–300, facial ₹600–750, pedicure ₹600–700",
+          "bot_next": "Continue",
+          "outcome": "C → PI candidate",
+          "result": "INFO"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B4",
+      "block": "Experience",
+      "type": "info",
+      "prompt_hinglish": "Wahan se aage badhne ka kyun socha?",
+      "probe": "Agar wahi cheez UC mein bhi hui to?",
+      "captures": [
+        "reason_left"
+      ],
+      "good_answer": "Growth, pay, travel",
+      "red_flags": "Wants flexibility / short hours",
+      "rule": "Conflicts with UC reality → stickiness down",
+      "est_seconds": 40,
+      "buckets": [
+        {
+          "bucket": "Growth / pay / travel",
+          "examples": "Salary kam thi",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Wanted flexibility",
+          "examples": "Timing zyada tha",
+          "bot_next": "Probe: 'UC mein 9–11 ghante?'",
+          "outcome": "Stickiness down",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B5",
+      "block": "Family income",
+      "type": "scored",
+      "prompt_hinglish": "Ghar mein kaun kaun kamata hai, aur kya kaam karte hain?",
+      "probe": "(If married) Pati abhi kaam kar rahe hain? Roughly kitna kama lete hain?",
+      "captures": [
+        "income_sources",
+        "husband_working",
+        "husband_occupation",
+        "husband_earning"
+      ],
+      "good_answer": "Clear picture",
+      "red_flags": "Refuses to share",
+      "rule": "Feeds need for money",
+      "est_seconds": 55,
+      "buckets": [
+        {
+          "bucket": "Husband working, modest income",
+          "examples": "Pati driver, 20–25k",
+          "bot_next": "Continue",
+          "outcome": "Supports need for money",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Husband not working / unwell",
+          "examples": "Kaam chhoot gaya",
+          "bot_next": "Continue",
+          "outcome": "Raises need for money",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Widow / single mother / divorced",
+          "examples": "Main hi kamaati hoon",
+          "bot_next": "Continue",
+          "outcome": "High need for money",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Unmarried, family earns",
+          "examples": "Papa farmer, bhai driver",
+          "bot_next": "Ask who depends on her",
+          "outcome": "Medium",
+          "result": "INFO"
+        },
+        {
+          "bucket": "Husband / family earns very well",
+          "examples": "Pati 1.5 lakh",
+          "bot_next": "Continue",
+          "outcome": "Need for money likely LOW",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Refuses to share",
+          "examples": "Nahi bata sakti",
+          "bot_next": "Move on",
+          "outcome": "Flag",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "Her income is needed at home: primary earner, single / widowed / separated, husband not working, or household income is modest"
+    },
+    {
+      "id": "B6",
+      "block": "Family income",
+      "type": "info",
+      "prompt_hinglish": "Mahine ka ghar ka kharcha kaise manage hota hai?",
+      "probe": null,
+      "captures": [
+        "earner_type"
+      ],
+      "good_answer": "Self primary, or household needs 2nd income",
+      "red_flags": "Spouse earns very well + no need",
+      "rule": "Cross-check with B5, B7",
+      "est_seconds": 25,
+      "buckets": [
+        {
+          "bucket": "Self",
+          "examples": "Main hi",
+          "bot_next": "Continue",
+          "outcome": "Raises need-for-money weight",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Fully spouse / family",
+          "examples": "Pati hi",
+          "bot_next": "Continue",
+          "outcome": "Cross-check with B7",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B7",
+      "block": "Need for money",
+      "type": "scored_hard_check",
+      "prompt_hinglish": "Pichli baar ghar mein sabse bada kharcha kis cheez pe hua tha — jaise hospital ka bill, school fees, ya kuch aur? Wo kaise manage hua?",
+      "probe": "Aage aisa koi bada kharcha aane wala hai?",
+      "captures": [
+        "need_for_money_level",
+        "need_detail"
+      ],
+      "good_answer": "Loan EMI, fees, house, treatment",
+      "red_flags": "'Apne liye', 'time pass'",
+      "rule": "Specific named need = High",
+      "est_seconds": 50,
+      "buckets": [
+        {
+          "bucket": "Specific liability",
+          "examples": "EMI, fees, ilaaj",
+          "bot_next": "Continue",
+          "outcome": "HIGH",
+          "result": "PASS"
+        },
+        {
+          "bucket": "General ambition",
+          "examples": "Kabhi ghar lena hai",
+          "bot_next": "Probe: 'Kab tak, kitna?'",
+          "outcome": "MEDIUM",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "No real need",
+          "examples": "Apne liye, time pass",
+          "bot_next": "Probe once",
+          "outcome": "LOW – heavy score down",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "Names a specific current or upcoming need, or a recent major expense (loan / EMI, fees, medical bill, house, supporting family)"
+    },
+    {
+      "id": "B8",
+      "block": "Earnings alignment",
+      "type": "scored",
+      "prompt_hinglish": "UC mein kamai PSP tier ke hisaab se hoti hai — Bronze mein kam se kam lagbhag ₹40,000 aur Gold mein ₹50,000 mahina. Aapke ghar ke kharche ke hisaab se ye kaisa lagta hai?",
+      "probe": "Aapko mahine mein kam se kam kitna chahiye ghar chalane ke liye?",
+      "captures": [
+        "accepts_minimum_earnings",
+        "minimum_needed_monthly"
+      ],
+      "good_answer": "Understands and accepts ₹40–50k minimum",
+      "red_flags": "Expects much more from day one / unhappy",
+      "rule": "Must leave knowing the minimum. Not a reject",
+      "est_seconds": 40,
+      "buckets": [
+        {
+          "bucket": "Accepts minimum",
+          "examples": "Haan, ₹40–50 hazaar se ghar chal jayega",
+          "bot_next": "Continue",
+          "outcome": "Correct",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Expects much more immediately",
+          "examples": "Mujhe pehle mahine se 80 chahiye",
+          "bot_next": "Restate minimum + growth up to ₹70–80k for top partners; ask again",
+          "outcome": "Not correct if still unrealistic",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "Accepts the minimum ₹40,000–50,000 PSP earnings; expectation is realistic"
+    },
+    {
+      "id": "B10",
+      "block": "Intent",
+      "type": "scored_hard_check",
+      "prompt_hinglish": "UC ke baare mein pehli baar kisse suna, aur unhone kya bataya?",
+      "probe": "Aapko sabse achhi cheez kya lagi?",
+      "captures": [
+        "why_uc"
+      ],
+      "good_answer": "Knows home-service model",
+      "red_flags": "No idea of model",
+      "rule": "—",
+      "est_seconds": 45,
+      "buckets": [
+        {
+          "bucket": "Knows the model",
+          "examples": "Ghar jaake service, achhi kamai",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Referred, little idea",
+          "examples": "Dost ne bola",
+          "bot_next": "Explain in 2 lines; ask what appeals",
+          "outcome": "Medium",
+          "result": "FLAG"
+        },
+        {
+          "bucket": "Learn then leave",
+          "examples": "Training lekar parlour kholungi",
+          "bot_next": "Probe timeline",
+          "outcome": "Stickiness LOW",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "Describes how UC works (home services via app, training, earnings) — not only 'someone told me'"
+    },
+    {
+      "id": "B12",
+      "block": "Stickiness",
+      "type": "scored",
+      "prompt_hinglish": "Saal mein kitni baar gaon ya ghar jaana hota hai, aur kitne din ke liye?",
+      "probe": null,
+      "captures": [
+        "exit_risks"
+      ],
+      "good_answer": "None / short planned leave",
+      "red_flags": "Long or frequent trips",
+      "rule": "—",
+      "est_seconds": 30,
+      "buckets": [
+        {
+          "bucket": "Nothing / short leave",
+          "examples": "Puja mein 10 din",
+          "bot_next": "Note dates",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Long / frequent trips",
+          "examples": "Har 2 mahine gaon",
+          "bot_next": "Probe",
+          "outcome": "Stickiness down",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "No long or frequent trips, wedding or move planned in the next 12 months"
+    },
+    {
+      "id": "B13",
+      "block": "Availability",
+      "type": "scored",
+      "prompt_hinglish": "Aapka weekend ka routine kya hota hai — Saturday-Sunday aap kya karti hain?",
+      "probe": "UC mein Saturday-Sunday 11 ghante kaam hota hai — un dinon ghar kaise chalega? Ghar walon ki kya raay hai?",
+      "captures": [
+        "weekend_ok",
+        "weekend_note"
+      ],
+      "good_answer": "Plan + family OK",
+      "red_flags": "Can't do Sundays",
+      "rule": "Can't do weekends → reject",
+      "est_seconds": 55,
+      "buckets": [
+        {
+          "bucket": "Plan + family OK",
+          "examples": "Saas ghar dekh legi",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Fixed short commitment",
+          "examples": "Sunday 8–10 church",
+          "bot_next": "Note",
+          "outcome": "Pass with calendar note",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Needs family permission",
+          "examples": "Pati se poochna padega",
+          "bot_next": "Callback within 2 days",
+          "outcome": "Hold",
+          "result": "HOLD"
+        },
+        {
+          "bucket": "Can't do weekends",
+          "examples": "Sunday nahi",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "Weekend routine allows 11-hour working days and family is on board"
+    },
+    {
+      "id": "B14",
+      "block": "Availability",
+      "type": "scored",
+      "prompt_hinglish": "Aur weekdays mein subah se raat tak aapka din kaise chalta hai?",
+      "probe": "Weekdays mein roz lagbhag 7.5 se 8.5 ghante kaam hota hai — ye aapke routine mein kaise fit hoga?",
+      "captures": [
+        "daily_hours_ok"
+      ],
+      "good_answer": "Accepts",
+      "red_flags": "Part-time only",
+      "rule": "Part-time only → reject",
+      "est_seconds": 45,
+      "buckets": [
+        {
+          "bucket": "Accepts",
+          "examples": "Theek hai",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Part-time only",
+          "examples": "4–5 ghante hi",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "Weekday routine allows 7.5–8.5 working hours a day"
+    },
+    {
+      "id": "B15",
+      "block": "Training",
+      "type": "info",
+      "prompt_hinglish": "Training 12 din (PR) ya 25 din (PI) ki hoti hai, subah 9 se shaam 7, hafte mein 6 din. Aap roz kaise aayengi, aur ghar ka kya intezaam hoga?",
+      "probe": "Isme sabse mushkil kya lagega?",
+      "captures": [
+        "training_ok"
+      ],
+      "good_answer": "Accepts + commute plan",
+      "red_flags": "Distance complaints",
+      "rule": "Won't attend → reject",
+      "est_seconds": 45,
+      "buckets": [
+        {
+          "bucket": "Accepts + commute plan",
+          "examples": "Metro se aa jaungi",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Refuses",
+          "examples": "Itne din nahi",
+          "bot_next": "Polite close",
+          "outcome": "Reject",
+          "result": "REJECT"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B16",
+      "block": "Models",
+      "type": "scored",
+      "prompt_hinglish": "Aapke aas-paas — padosi, rishtedaar, saheliyan — kitni ladies aapse eyebrows ya waxing karwati hain?",
+      "probe": "Training ke time unme se kitni practice ke liye aa sakti hain?",
+      "captures": [
+        "models_count"
+      ],
+      "good_answer": "5–10 named",
+      "red_flags": "0 / new to city",
+      "rule": "< 5 → flag: trainer helps (not a reject)",
+      "est_seconds": 40,
+      "buckets": [
+        {
+          "bucket": "5–10 named",
+          "examples": "Padosi, bhabhi",
+          "bot_next": "Continue",
+          "outcome": "Full points",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Fewer than 5 / none",
+          "examples": "2–3 / kisi ko nahi",
+          "bot_next": "Note",
+          "outcome": "Flag: trainer helps",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": true,
+      "correct_if": "Can bring 5 or more practice models"
+    },
+    {
+      "id": "B17",
+      "block": "Kit payment",
+      "type": "info",
+      "prompt_hinglish": "Screening clear hone ke baad ₹2,000 ka kit lena hota hai — ye aap kaise arrange karengi?",
+      "probe": null,
+      "captures": [
+        "recharge_ok",
+        "recharge_date"
+      ],
+      "good_answer": "Yes / with a date",
+      "red_flags": "Can't arrange",
+      "rule": "Not a hard reject → flag / hold",
+      "est_seconds": 20,
+      "buckets": [
+        {
+          "bucket": "Yes / with date",
+          "examples": "Ho jayega",
+          "bot_next": "Continue",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Can't arrange now",
+          "examples": "Abhi paise nahi",
+          "bot_next": "Note",
+          "outcome": "Flag / hold – not a reject",
+          "result": "HOLD"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B18",
+      "block": "Timeline",
+      "type": "info",
+      "prompt_hinglish": "Agla batch [batch date] ko shuru ho raha hai. Kya aap us din se aa sakti hain?",
+      "probe": "Agar nahi, to exact kis date se? Koi notice period chal raha hai?",
+      "captures": [
+        "committed_start_date"
+      ],
+      "good_answer": "Confirms batch date",
+      "red_flags": "Vague: 'dekhte hain', > 30 days",
+      "rule": "Date locked in record. > 30 days → re-screen",
+      "est_seconds": 30,
+      "buckets": [
+        {
+          "bucket": "Confirms batch date",
+          "examples": "Haan, aa jaungi",
+          "bot_next": "Lock date",
+          "outcome": "Pass",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Specific later date ≤ 30 days",
+          "examples": "15 tareekh se",
+          "bot_next": "Lock that date",
+          "outcome": "Hold for next batch",
+          "result": "HOLD"
+        },
+        {
+          "bucket": "Vague / > 30 days",
+          "examples": "Dekhte hain / 2 mahine baad",
+          "bot_next": "Ask for exact date once",
+          "outcome": "Flag; re-screen if > 30 days",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "B19",
+      "block": "Docs",
+      "type": "info_manual_check",
+      "prompt_hinglish": "Kya aapka PAN, Aadhaar se linked hai aur dono mein naam same hai?",
+      "probe": null,
+      "captures": [
+        "pan_aadhaar_status"
+      ],
+      "good_answer": "Yes",
+      "red_flags": "Not linked / mismatch",
+      "rule": "Verified manually; fix before batch",
+      "est_seconds": 20,
+      "buckets": [
+        {
+          "bucket": "Yes / not sure",
+          "examples": "Haan / pata nahi",
+          "bot_next": "Share fix steps if needed",
+          "outcome": "Manual verification",
+          "result": "MANUAL"
+        }
+      ],
+      "stage": "B",
+      "scored": false
+    },
+    {
+      "id": "D1",
+      "block": "Close",
+      "type": "info",
+      "prompt_hinglish": "Kya aapko UC ke baare mein kuch poochna hai?",
+      "probe": null,
+      "captures": [
+        "questions_asked"
+      ],
+      "good_answer": "Asks about earnings, training, jobs",
+      "red_flags": "Only flexibility / leave",
+      "rule": "Small intent signal",
+      "est_seconds": 45,
+      "buckets": [
+        {
+          "bucket": "Earnings / training / jobs",
+          "examples": "Pehle mahine kitne jobs?",
+          "bot_next": "Answer from FAQ",
+          "outcome": "Positive intent",
+          "result": "PASS"
+        },
+        {
+          "bucket": "Only flexibility / leave",
+          "examples": "Chhutti kab?",
+          "bot_next": "Answer from FAQ",
+          "outcome": "Mild intent flag",
+          "result": "FLAG"
+        }
+      ],
+      "stage": "D",
+      "scored": false
+    },
+    {
+      "id": "D2",
+      "block": "Close",
+      "type": "info",
+      "prompt_hinglish": "Dhanyavaad! Hamari team aapko agla step batayegi.",
+      "probe": null,
+      "captures": [],
+      "good_answer": "",
+      "red_flags": "",
+      "rule": "Bot never states pass / fail",
+      "est_seconds": 10,
+      "buckets": [],
+      "stage": "D",
+      "scored": false
+    }
+  ],
+  "scenario_bank": [
+    {
+      "id": "C1",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Facial mask ke time acne wali customer kehti hai jalan ho rahi hai. Aap kya karengi?",
+      "probe": "Aur uske baad?",
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Stops, removes the product and soothes the skin"
+    },
+    {
+      "id": "C2",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Customer ne thick eyebrows bola tha, par ek eyebrow zyada patli ho gayi. Customer gussa hai. Kya karengi?",
+      "probe": "Agli baar ye na ho, uske liye kya karengi?",
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Owns the mistake and mentions consultation / mirror check before & during service"
+    },
+    {
+      "id": "C3",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Honey wax ke time customer baar baar bol rahi hai wax bahut garam hai. Kya karengi?",
+      "probe": null,
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Stops or lowers the temperature and checks comfort before continuing"
+    },
+    {
+      "id": "C4",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Service ke time customer ka bachcha baar baar beech mein aa raha hai. Kya karengi?",
+      "probe": null,
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Explains the safety risk and asks the customer to keep the child engaged"
+    },
+    {
+      "id": "C5",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Cleanup ke baad customer chhota back massage maangti hai jo service mein nahi hai. Kya karengi?",
+      "probe": null,
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Explains it's not included and offers to add it on the app"
+    },
+    {
+      "id": "C6",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Customer app ke bahar discount maang rahi hai. Kya karengi?",
+      "probe": "Agar wo zid kare to?",
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Politely refuses any off-app discount; price is as per app"
+    },
+    {
+      "id": "C7",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Customer ek service add karna chahti hai jo book nahi ki. Kya karengi?",
+      "probe": "Payment kaise hoga?",
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Adds the service on the app (no cash, no off-app)"
+    },
+    {
+      "id": "C8",
+      "block": "Customer centricity",
+      "type": "scored",
+      "prompt_hinglish": "Traffic ki wajah se aap job pe 20 minute late ho rahi hain. Kya karengi?",
+      "probe": "Pahunchne ke baad kya karengi?",
+      "captures": [
+        "scenario_bucket"
+      ],
+      "est_seconds": 60,
+      "correct_if": "Informs the customer before reaching, with an ETA, and apologises"
+    }
+  ],
+  "technical_bank": {
+    "selection": "K1 always + 3 random of K2–K7",
+    "rule": "Disha never names brands; she asks for them. Answers judged objectively against 'correct_if'.",
+    "status": "Trainer team to validate answers before pilot",
+    "items": [
+      {
+        "id": "K1",
+        "prompt_hinglish": "Aapne kaam mein kaun kaun se wax aur facial ke brands use kiye hain? Naam bataiye.",
+        "probe": "Kaunsa wax kis body part pe use karti thi?",
+        "correct_if": "Names at least 2 wax brands/types and 2 facial brands/kits on her own",
+        "partial": "Names 1–2 products only",
+        "wrong": "Can't name any",
+        "est_seconds": 50
+      },
+      {
+        "id": "K2",
+        "prompt_hinglish": "Haath-pair ki waxing aur chehre ki waxing mein kya farak hota hai?",
+        "probe": "Chehre ke liye kaunsa wax lagati hain?",
+        "correct_if": "Face: peel-off/hard wax or gentle wax in small patches, lower temperature; arms/legs: strip / roll-on wax",
+        "partial": "Knows one difference",
+        "wrong": "No difference / no idea",
+        "est_seconds": 45
+      },
+      {
+        "id": "K3",
+        "prompt_hinglish": "Intimate yaani bikini area ki waxing ke liye kaunsa wax use karte hain, aur kya dhyan rakhte hain?",
+        "probe": null,
+        "correct_if": "Peel-off / hard (Brazilian) wax + hygiene: gloves, disposable spatula, no double-dipping",
+        "partial": "Knows the wax but no hygiene point (or vice versa)",
+        "wrong": "Uses normal strip wax / no idea",
+        "est_seconds": 45
+      },
+      {
+        "id": "K4",
+        "prompt_hinglish": "Waxing se pehle aur baad mein skin pe kya lagati hain?",
+        "probe": "Customer ko baad mein kya dhyan rakhne ko kehti hain?",
+        "correct_if": "Before: clean, dry skin + talc / powder; after: post-wax oil or soothing gel / aloe",
+        "partial": "Only one of before / after",
+        "wrong": "Nothing / no idea",
+        "est_seconds": 45
+      },
+      {
+        "id": "K5",
+        "prompt_hinglish": "Ek normal facial ke steps bataiye — shuru se end tak.",
+        "probe": null,
+        "correct_if": "At least 4 of: cleanse → scrub → steam → massage → mask → toner/moisturiser, in order",
+        "partial": "Steps named but wrong order",
+        "wrong": "Can't list steps",
+        "est_seconds": 50
+      },
+      {
+        "id": "K6",
+        "prompt_hinglish": "Pimple wali skin pe facial karte waqt kya nahi karna chahiye?",
+        "probe": null,
+        "correct_if": "No heavy massage / no harsh scrub / don't squeeze active acne",
+        "partial": "Vague 'dhyan rakhenge'",
+        "wrong": "Treats like normal skin",
+        "est_seconds": 40
+      },
+      {
+        "id": "K7",
+        "prompt_hinglish": "Pedicure ke baad tools aur baaki saamaan ka kya karti hain?",
+        "probe": null,
+        "correct_if": "Disposables thrown, metal tools cleaned and sterilised, fresh towel each customer",
+        "partial": "Cleans but doesn't sterilise",
+        "wrong": "Reuses without cleaning / no idea",
+        "est_seconds": 35
+      }
+    ]
+  },
+  "output_schema": {
+    "per_turn": {
+      "step": "str",
+      "bucket": "str",
+      "result": "PASS|FLAG|HOLD|MANUAL|DEFER|REJECT|INFO",
+      "fields": "object",
+      "needs_probe": "bool",
+      "probe_text": "str|null",
+      "evidence_quote": "str"
+    },
+    "final": {
+      "candidate_id": "str",
+      "language": "str",
+      "basic_checks": "object",
+      "dimension_scores": "object (0–100 + quote each)",
+      "overall_score": "0–100",
+      "band": "auto_pass|manual_review|reject|defer",
+      "top_reasons": "list[3]",
+      "manual_checks_pending": "list",
+      "routing": "PR|PI|NE|none",
+      "flags": "list",
+      "duration_seconds": "int"
+    }
+  },
+  "closed_decisions": {
+    "rating_threshold": "4.7 (assumed)",
+    "c5_rewrite": "approved",
+    "baby_plan": "≤6 months defer · 6–12 months score down",
+    "ne_batch": "fresher-quality hard skills + passes soft checks (assumed)",
+    "did_not_answer": "0 points",
+    "manual_check_owner": "screening_ops (assumed)",
+    "grooming": "manual checklist",
+    "salon_tier_bands": "facial rate <800 / 800–1999 / ≥2000 (assumed)",
+    "weight_rule": "<40 or >85 kg → review (assumed)",
+    "under_3_child": "defer",
+    "husband_dependency": "flag only"
+  },
+  "question_style": "Natural and indirect: ask about routines, recent experiences and real situations rather than yes/no eligibility questions; infer the field, confirm only if unclear.",
+  "objection_handling": {
+    "applies_to_steps": "all steps except A0, A2, A4, A6, A10, A11",
+    "max_attempts": 1,
+    "rule": "Address the concern once using only approved UC terms, then re-ask. Still refuses → confirm → close. Agrees → FLAG '(agreed after convincing)'.",
+    "approved_terms_editable_in_prototype_settings": true
+  },
+  "hubs": [
+    "Sarjapur (Sparsh)",
+    "Ambalipura",
+    "Mahadevpura",
+    "Green Glen Layout",
+    "Brookfield",
+    "Munnekollal",
+    "HSR Sector 3",
+    "HSR Sector 4",
+    "HSR Sector 6",
+    "Eastwood Township",
+    "Koramangala 3rd Block",
+    "Ecoworld",
+    "Channasandra",
+    "Electronic City",
+    "Kodihalli",
+    "Felicity Mall",
+    "Chudasandra",
+    "Embassy Tech Village",
+    "CV Raman Nagar",
+    "Tavarekere",
+    "Begur",
+    "Prestige Tech Park",
+    "Hoodi",
+    "Chinnappa Layout",
+    "Jakkur",
+    "Chikkabellandur",
+    "Indiranagar",
+    "Bommanahalli",
+    "Muneshwara Nagar",
+    "Kaikondrahalli",
+    "Neopolis",
+    "JC Nagar",
+    "Esteem Mall",
+    "Junnasandra",
+    "Carmel Layout",
+    "Yemlur",
+    "Doddanagamangala"
+  ],
+  "uc_terms": [
+    "Minimum earnings depend on the PSP tier: about ₹40,000 a month at Bronze up to ₹50,000 a month at Gold. Top partners can earn up to ₹70,000–80,000 a month. Never quote any other earning figure.",
+    "PSP working hours: weekdays 7.5 hours a day (Bronze), 8 (Silver), 8.5 (Gold); weekends 11 hours a day for all tiers.",
+    "PSP ratings needed: 4.7 (Bronze), 4.8 (Silver), 4.9 (Gold) on the last 50 rated jobs.",
+    "Offs: 3 weekdays + 1 weekend day off a month. Leaves: 1 emergency leave a month; 5 weekdays + 2 weekend days a quarter.",
+    "Training: 12 days (Prime Regular) or 25 days (Prime Intensive), 9 am–7 pm, 6 days a week at the UC training centre.",
+    "After passing the screening: ₹2,000 kit payment.",
+    "Jobs are usually 3–4 km apart around her hub; travel is on a 2-wheeler, which she can learn to ride.",
+    "Trainers help arrange practice models if she can't bring enough.",
+    "All bookings and payments come through the UC app; no cash deals or off-app services.",
+    "Running her own salon or private clients alongside UC is not allowed.",
+    "If something is not covered here, say the trainer or team will explain – never guess."
+  ],
+  "kit_payment": {
+    "amount_inr": 2000,
+    "when": "after passing screening",
+    "hard_reject": false
+  },
+  "psp": {
+    "weekday_hours_per_day": {
+      "Gold": 8.5,
+      "Silver": 8,
+      "Bronze": 7.5
+    },
+    "weekend_hours_per_day": 11,
+    "rating_L50": {
+      "Gold": 4.9,
+      "Silver": 4.8,
+      "Bronze": 4.7
+    },
+    "offs_per_month": "3 weekdays + 1 weekend day",
+    "leaves": {
+      "emergency_per_month": 1,
+      "per_quarter": "5 weekdays + 2 weekend days"
+    },
+    "minimum_earnings_inr": {
+      "Bronze": 40000,
+      "Gold": 50000
+    },
+    "top_partner_earnings_inr": "70,000–80,000"
+  },
+  "roleplay": {
+    "id": "R1",
+    "block": "Tone & sensitivity",
+    "setup_hinglish": "Ab ek chhota sa role-play karte hain. Main customer banti hoon aur aap UC partner. Main aapko apni shikayat bataungi, aap waise hi jawab dijiye jaise asli customer ko dengi.",
+    "opening_line_hinglish": "Aap 20 minute late aayi ho, aur ab jaldi-jaldi kar rahi ho! Mujhe aisi service nahi chahiye.",
+    "max_customer_turns": 3,
+    "correct_if": [
+      "Speaks respectfully (ji / ma'am / aap)",
+      "Apologises before explaining",
+      "Acknowledges the customer's feeling",
+      "Offers a fix (full service, no rushing)"
+    ],
+    "not_correct_if": [
+      "Argues or justifies first",
+      "Blames the customer, escalates, or goes silent",
+      "Curt or sarcastic words",
+      "Threatens to leave or cancel"
+    ],
+    "est_seconds": 120
+  }
+}
